@@ -70,9 +70,9 @@ function shareRecommend() {
   const c = cv.getContext('2d');
   const font = (w, px) => `${w} ${px}px -apple-system, "PingFang SC", "Microsoft YaHei", sans-serif`;
 
-  c.fillStyle = '#fafaf9'; c.fillRect(0, 0, W, H);
+  c.fillStyle = '#F7F5F0'; c.fillRect(0, 0, W, H);
   const g = c.createLinearGradient(0, 0, W, 300);
-  g.addColorStop(0, '#059669'); g.addColorStop(1, '#0d9488');
+  g.addColorStop(0, '#23897A'); g.addColorStop(1, '#155A51');
   c.fillStyle = g; c.fillRect(0, 0, W, 330);
 
   c.fillStyle = '#fff';
@@ -91,7 +91,7 @@ function shareRecommend() {
     c.fillStyle = '#1c1917'; c.font = font(400, 30);
     const name = `${it.emoji || '📦'} ${it.name}`;
     c.fillText(name.length > 16 ? name.slice(0, 16) + '…' : name, pad, y);
-    c.fillStyle = '#047857'; c.font = font(700, 30);
+    c.fillStyle = '#155A51'; c.font = font(700, 30);
     const p = yuan(it.price); c.fillText(p, W - pad - c.measureText(p).width, y);
   });
   c.fillStyle = '#78716c'; c.font = font(400, 22);

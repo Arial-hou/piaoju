@@ -3,7 +3,7 @@ const STORE_KEY = 'piaoju:v1';
 
 const DEFAULT_STATE = () => ({
   recommend: { rentMonths: 6, roomTags: ['合租', '公共卫生间'], budget: 1500, habits: ['cooking'], customHabits: [], customItems: [], step: 1, showResults: false },
-  buyOrRent: { selectedId: null, useCount: 20, months: null, showResult: false },
+  buyOrRent: { selectedId: null, useCount: 20, months: null, showResult: false, showAdd: false, customItems: [] }, // customItems 结构同 buyOrRentItems，另带 custom:true
   moving: { itemName: '', originalPrice: '', useMonths: '', condition: 8, tone: 'casual', showResult: false },
   lease: { moveIn: '', moveOut: '', rent: '', deposit: '' },      // F4 退租倒计时
   inventory: [],                                                 // F2 我的物品库 {id,name,emoji,price,boughtAt,weight,soldPrice,status}
@@ -68,3 +68,5 @@ function rentItemPrices(item) {
   };
 }
 function isOverridden(key) { return S.priceOverrides[key] > 0; }
+// 买还是租：内置物品 + 用户自定义物品
+function borItems() { return buyOrRentItems.concat(S.buyOrRent.customItems || []); }

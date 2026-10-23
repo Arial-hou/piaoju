@@ -6,7 +6,7 @@ function renderHome() {
   const quote = dailyQuotes[new Date().getDate() % dailyQuotes.length];
 
   const leaseCard = lease ? `
-    <a href="#/lease" class="block bg-white rounded-2xl p-4 mb-4 shadow-sm border border-stone-200 btn-press">
+    <a href="#/lease" class="block bg-white rounded-3xl p-4 mb-5 shadow-card btn-press">
       <div class="flex items-center justify-between">
         <span class="text-sm font-semibold text-stone-700 flex items-center gap-1.5">${icon('calendar', 16, 'text-primary-600')}退租倒计时</span>
         <span class="text-xs text-primary-700 font-medium">详情 ›</span>
@@ -17,62 +17,73 @@ function renderHome() {
       </div>
       ${lease.todo.length ? `<p class="text-xs text-stone-600 mt-1">👉 ${escapeHtml(lease.todo[lease.todo.length - 1].text)}</p>` : lease.upcoming ? `<p class="text-xs text-stone-500 mt-1">下一步（剩 ${lease.upcoming.days} 天时）：${escapeHtml(lease.upcoming.text)}</p>` : ''}
     </a>` : `
-    <a href="#/lease" class="flex items-center justify-between bg-white rounded-2xl p-4 mb-4 shadow-sm border border-dashed border-primary-300 btn-press">
+    <a href="#/lease" class="flex items-center justify-between bg-white/70 rounded-3xl p-4 mb-5 border border-dashed border-primary-300 btn-press">
       <span class="text-sm text-stone-700 flex items-center gap-2">${icon('calendar', 18, 'text-primary-600')}填一下退租日期，到点提醒你卖东西、约搬家</span>
       <span class="text-primary-700 text-sm font-medium flex-shrink-0 ml-2">去填 ›</span>
     </a>`;
 
   const tool = (href, ic, color, title, desc) => `
-    <a href="#${href}" class="btn-press bg-white rounded-2xl p-4 shadow-sm border border-stone-200 card-hover flex flex-col">
-      <span class="w-10 h-10 rounded-xl ${color} flex items-center justify-center mb-2">${icon(ic, 20)}</span>
-      <span class="font-bold text-stone-900">${title}</span>
-      <span class="text-xs text-stone-600 mt-0.5 leading-snug">${desc}</span>
+    <a href="#${href}" class="btn-press bg-white rounded-3xl p-4 shadow-card card-hover flex flex-col">
+      <span class="w-11 h-11 rounded-2xl ${color} flex items-center justify-center mb-3">${icon(ic, 22)}</span>
+      <span class="font-bold text-stone-900 text-[15px]">${title}</span>
+      <span class="text-xs text-stone-500 mt-1 leading-snug">${desc}</span>
     </a>`;
+  const hour = new Date().getHours();
+  const hello = hour < 6 ? '夜深了' : hour < 11 ? '早上好' : hour < 14 ? '中午好' : hour < 18 ? '下午好' : '晚上好';
 
   return `
     <div class="page">
-      <div class="text-center mb-5 pt-2">
-        <h1 class="text-3xl font-bold text-stone-900 tracking-tight">漂居</h1>
-        <p class="text-stone-600 text-sm mt-1">短租青年的租房生活消费助手</p>
-      </div>
+      <header class="flex items-center justify-between mb-4 pt-1">
+        <div>
+          <p class="text-[13px] text-stone-500">${hello}，漂泊的你</p>
+          <h1 class="text-[26px] leading-tight font-extrabold text-stone-900 tracking-tight">漂居<span class="text-accent-500">.</span></h1>
+        </div>
+        <a href="#/settings" class="w-10 h-10 rounded-full bg-white shadow-card flex items-center justify-center text-stone-600 btn-press" aria-label="价格与数据设置">${icon('edit', 18)}</a>
+      </header>
+
+      <section class="hero rounded-4xl p-5 mb-4 text-white shadow-lift relative overflow-hidden">
+        <div class="flex items-center justify-between">
+          <span class="text-sm font-medium text-white/85">我的租房设定</span>
+          <a href="#/recommend" class="text-xs font-medium bg-white/15 hover:bg-white/25 px-3 py-1 rounded-full">修改</a>
+        </div>
+        <div class="flex flex-wrap gap-1.5 mt-3">
+          <span class="text-xs px-2.5 py-1 rounded-full bg-white/20 font-medium">住 ${s.months} 个月</span>
+          <span class="text-xs px-2.5 py-1 rounded-full bg-white/10">预算 ${yuan(s.budget)}</span>
+          ${S.recommend.roomTags.map(t => `<span class="text-xs px-2.5 py-1 rounded-full bg-white/10">${escapeHtml(t)}</span>`).join('')}
+        </div>
+        <div class="mt-5">
+          <div class="text-xs text-white/75">每月实际花</div>
+          <div class="text-[40px] leading-none font-extrabold mt-1 tracking-tight">${yuan(s.perMonth)}</div>
+        </div>
+        <div class="grid grid-cols-2 gap-2 mt-4">
+          <div class="rounded-2xl px-3 py-2.5" style="background:rgba(255,255,255,.12)"><div class="text-[11px] text-white/75">建议添置</div><div class="font-bold text-lg">${yuan(s.total)}</div></div>
+          <div class="rounded-2xl px-3 py-2.5" style="background:rgba(255,255,255,.12)"><div class="text-[11px] text-white/75">退租可卖回</div><div class="font-bold text-lg text-accent-200">${yuan(s.back)}</div></div>
+        </div>
+        <a href="#/recommend" class="mt-4 flex items-center justify-center gap-1.5 bg-white text-primary-800 py-3 rounded-2xl font-bold btn-press">${icon('list', 18)}查看入住清单</a>
+      </section>
 
       ${leaseCard}
 
-      <section class="bg-white rounded-3xl p-5 mb-4 shadow-sm border border-stone-200">
-        <div class="flex items-center justify-between mb-3">
-          <span class="text-sm font-semibold text-stone-700">我的租房设定</span>
-          <a href="#/recommend" class="text-xs text-primary-700 font-medium">修改 ›</a>
-        </div>
-        <div class="flex flex-wrap gap-2 mb-4">
-          <span class="chip chip-primary">住 ${s.months} 个月</span>
-          <span class="chip">预算 ${yuan(s.budget)}</span>
-          ${S.recommend.roomTags.map(t => `<span class="chip">${escapeHtml(t)}</span>`).join('')}
-        </div>
-        <div class="grid grid-cols-3 gap-2 text-center">
-          <div class="p-3 rounded-2xl bg-stone-50"><div class="text-lg font-bold text-stone-900">${yuan(s.total)}</div><div class="text-xs text-stone-600 mt-0.5">建议添置</div></div>
-          <div class="p-3 rounded-2xl bg-primary-50"><div class="text-lg font-bold text-primary-700">${yuan(s.back)}</div><div class="text-xs text-primary-700 mt-0.5">退租可卖回</div></div>
-          <div class="p-3 rounded-2xl bg-amber-50"><div class="text-lg font-bold text-amber-700">${yuan(s.perMonth)}</div><div class="text-xs text-amber-700 mt-0.5">每月实际花</div></div>
-        </div>
-        <a href="#/recommend" class="mt-4 block text-center gradient-card text-white py-3 rounded-xl font-semibold btn-press">查看入住清单</a>
-      </section>
-
-      <div class="grid grid-cols-2 gap-3 mb-4">
-        ${tool('/buy-or-rent', 'scale', 'bg-amber-50 text-amber-700', '买还是租', '算上转卖和搬家再决定')}
-        ${tool('/moving', 'tag', 'bg-rose-50 text-rose-700', '转卖文案', '估价 + 一键生成闲鱼文案')}
+      <div class="flex items-center justify-between mb-2.5 mt-1 px-1"><h2 class="text-base font-bold text-stone-900">租房工具箱</h2><span class="text-xs text-stone-400">6 个</span></div>
+      <div class="grid grid-cols-2 gap-3 mb-5">
+        ${tool('/buy-or-rent', 'scale', 'bg-accent-50 text-accent-600', '买还是租', '支持自定义物品，算完再决定')}
+        ${tool('/moving', 'tag', 'bg-rose-50 text-rose-600', '转卖文案', '估价 + 一键生成闲鱼文案')}
         ${tool('/inventory', 'box', 'bg-sky-50 text-sky-700', '我的物品', inv.length ? `在用 ${inv.length} 件` : '记下买了啥，退租好清算')}
         ${tool('/settle', 'coin', 'bg-primary-50 text-primary-700', '退租清算', '卖什么、带什么、回多少钱')}
         ${tool('/move-cost', 'truck', 'bg-violet-50 text-violet-700', '搬家估算', '打车、面包车还是搬家公司')}
-        ${tool('/inspect', 'check', 'bg-stone-100 text-stone-700', '验房清单', '入住退租逐项拍照，保押金')}
+        ${tool('/inspect', 'check', 'bg-amber-50 text-amber-700', '验房清单', '入住退租逐项拍照，保押金')}
       </div>
 
-      <p class="text-center text-stone-500 text-sm italic pb-4">“${quote}”</p>
-      <p class="text-center text-xs text-stone-500 pb-2">数据只存在你的浏览器里 · <a href="#/settings" class="underline">价格与数据设置</a></p>
+      <div class="rounded-3xl bg-white/60 border border-stone-200/70 px-5 py-4 text-center mb-3">
+        <p class="text-stone-600 text-sm leading-relaxed">“${quote}”</p>
+      </div>
+      <p class="text-center text-xs text-stone-400 pb-2">数据只存在你的浏览器里 · <a href="#/settings" class="underline">价格与数据设置</a></p>
     </div>`;
 }
 
 // ==================== 入住清单：分步表单（U7）+ 结果页（U5/U6） ====================
 function tagBtn(onclick, label, selected, extra = '') {
-  return `<button type="button" onclick="${onclick}" aria-pressed="${selected}" class="tag px-4 py-2 rounded-xl text-sm border font-medium ${selected ? 'selected' : 'bg-white text-stone-700 border-stone-300'}">${extra}${label}</button>`;
+  return `<button type="button" onclick="${onclick}" aria-pressed="${selected}" class="tag px-4 py-2.5 rounded-full text-sm border font-medium ${selected ? 'selected' : 'bg-white text-stone-700 border-stone-200 hover:border-primary-300'}">${extra}${label}</button>`;
 }
 
 function renderRecommend() {
@@ -83,7 +94,7 @@ function renderRecommend() {
   const bar = `
     <ol class="flex gap-2 mb-4" aria-label="步骤">
       ${steps.map((t, i) => `<li class="flex-1"><button type="button" onclick="recStep(${i + 1})" class="w-full text-left" ${i + 1 === step ? 'aria-current="step"' : ''}>
-        <div class="h-1.5 rounded-full ${i + 1 <= step ? 'bg-primary-500' : 'bg-stone-200'}"></div>
+        <div class="h-2 rounded-full transition-colors ${i + 1 <= step ? 'bg-primary-500' : 'bg-stone-200'}"></div>
         <div class="text-xs mt-1 ${i + 1 === step ? 'text-primary-700 font-semibold' : 'text-stone-500'}">${i + 1}. ${t}</div></button></li>`).join('')}
     </ol>`;
 
@@ -156,7 +167,7 @@ function itemCard(item, tone, i) {
   const toneCls = { primary: 'bg-primary-50/70 border-primary-200', amber: 'bg-amber-50/70 border-amber-200', rose: 'bg-rose-50/70 border-rose-200' }[tone];
   const priceCls = { primary: 'text-primary-700', amber: 'text-amber-700', rose: 'text-rose-700' }[tone];
   return `
-    <li class="stagger-item p-4 rounded-xl border ${toneCls}" style="animation-delay:${i * 0.04}s">
+    <li class="stagger-item p-4 rounded-2xl border ${toneCls}" style="animation-delay:${i * 0.04}s">
       <div class="flex items-start">
         <span class="emoji-lg mr-3" aria-hidden="true">${item.emoji || '📦'}</span>
         <div class="flex-1 min-w-0">
@@ -182,7 +193,7 @@ function itemCard(item, tone, i) {
 function renderRecommendResult() {
   const { mustBuy, optional, avoid, summary: s } = computeRecommendation(S.recommend);
   const section = (title, list, tone, empty, open = true) => `
-    <details class="bg-white rounded-2xl p-5 shadow-sm border border-stone-200 mb-4 group" ${open ? 'open' : ''}>
+    <details class="bg-white rounded-3xl p-5 shadow-card mb-4 group" ${open ? 'open' : ''}>
       <summary class="flex items-center cursor-pointer select-none list-none">
         <h2 class="font-bold text-stone-900 text-lg">${title}</h2>
         <span class="ml-2 text-xs chip">${list.length} 件</span>
@@ -194,7 +205,7 @@ function renderRecommendResult() {
   return `
     <div class="page">
       ${pageHeader('入住清单', `住 ${s.months} 个月 · 预算 ${yuan(s.budget)} · ${escapeHtml(S.recommend.roomTags.join('/') || '未选房型')}`)}
-      <div class="sticky-summary gradient-card rounded-2xl px-5 py-3 text-white shadow-lg mb-4" role="status">
+      <div class="sticky-summary hero rounded-3xl px-5 py-3.5 text-white shadow-lift mb-4" role="status">
         <div class="flex items-center justify-between gap-3">
           <div class="min-w-0">
             <div class="text-xs text-primary-100">实际花费 ${yuan(s.net)} · 预算剩 ${yuan(s.budget - s.total)}</div>

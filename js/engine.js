@@ -61,11 +61,11 @@ function computeBuyOrRent(item, months, useCount) {
   const uses = Math.max(1, Math.round(useCount * months / 12));
   const moveCost = MOVE_COST[item.storageDiff === '高' ? '重' : item.storageDiff === '中' ? '中' : '轻'];
   const resale = resaleValue(buyPrice, item.resaleValue / 100, months);
-  const maintain = Math.round(item.maintainCost * months / 12);
+  const maintain = Math.round((Number(item.maintainCost) || 0) * months / 12);
   const buyNet = buyPrice - resale + maintain + moveCost;
   const rentTotal = rentPrice * uses;
   const diff = rentTotal - buyNet;
-  const breakEven = Math.ceil(buyNet / rentPrice);
+  const breakEven = rentPrice > 0 ? Math.max(1, Math.ceil(buyNet / rentPrice)) : 1;
   const closeCall = Math.abs(diff) <= Math.max(50, buyNet * 0.1);
   const verdict = closeCall ? 'close' : diff > 0 ? 'buy' : 'rent';
   return { buyPrice, rentPrice, uses, moveCost, resale, maintain, buyNet, rentTotal, diff, breakEven, closeCall, verdict, perUseBuy: buyNet / uses, months };

@@ -129,7 +129,7 @@ function renderInspect() {
         <h2 class="font-semibold text-stone-900 mb-1">${escapeHtml(g.group)}</h2>
         <ul>${g.items.map((it, i) => { const k = g.group + '|' + it, on = !!done[k], id = 'ck-' + INSPECT_LIST.indexOf(g) + '-' + i; return `
           <li class="border-b border-stone-100 last:border-0"><label for="${id}" class="flex items-start gap-3 py-2.5 cursor-pointer">
-            <input id="${id}" type="checkbox" ${on ? 'checked' : ''} onchange="inspectToggle(${JSON.stringify(k).replace(/"/g, '&quot;')})" class="mt-0.5 w-5 h-5 accent-emerald-600 flex-shrink-0">
+            <input id="${id}" type="checkbox" ${on ? 'checked' : ''} onchange="inspectToggle(${JSON.stringify(k).replace(/"/g, '&quot;')})" class="mt-0.5 w-5 h-5 accent-primary-600 flex-shrink-0">
             <span class="text-sm leading-snug ${on ? 'text-stone-500 line-through' : 'text-stone-800'}">${escapeHtml(it)}</span></label></li>`; }).join('')}</ul>`)).join('')}
       <button type="button" onclick="inspectReset()" class="btn-press w-full bg-white text-stone-800 py-3 rounded-2xl font-semibold border border-stone-300">清空勾选（换房子时用）</button>
       ${hint('照片比勾选更重要：每一项拍照或录视频，发给房东留底。')}

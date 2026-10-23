@@ -64,7 +64,36 @@ function addToInventoryFromRec(id) {
 }
 
 // ---------- 买还是租 ----------
-function borSelect(id) { S.buyOrRent.selectedId = id; S.buyOrRent.showResult = false; commit(); }
+function borSelect(id) {
+  S.buyOrRent.selectedId = id; S.buyOrRent.showResult = false; commit();
+  setTimeout(() => document.getElementById('borSettings')?.scrollIntoView?.({ behavior: 'smooth', block: 'start' }), 30);
+}
+function borToggleAdd(open) { S.buyOrRent.showAdd = open ?? !S.buyOrRent.showAdd; commit(); if (S.buyOrRent.showAdd) setTimeout(() => document.getElementById('borNewName')?.focus(), 30); }
+function borAddCustom() {
+  const v = id => document.getElementById(id)?.value ?? '';
+  const name = v('borNewName').trim();
+  const buyPrice = num(v('borNewBuy')), rentPrice = num(v('borNewRent'));
+  const storageDiff = v('borNewSize') || '低';
+  const resaleValue = Math.min(90, Math.max(0, num(v('borNewResale'), 40)));
+  const maintainCost = Math.max(0, num(v('borNewMaintain'), 0));
+  ['borNewName', 'borNewBuy', 'borNewRent'].forEach(id => showFieldError(id, ''));
+  if (!name) return showFieldError('borNewName', '写一下物品名称');
+  if (borItems().some(i => i.name === name.slice(0, 16))) return showFieldError('borNewName', '已经有这件了，直接在上面选');
+  if (!(buyPrice > 0) || buyPrice > 1000000) return showFieldError('borNewBuy', '买价填大于 0 的数字');
+  if (!(rentPrice > 0) || rentPrice > 100000) return showFieldError('borNewRent', '单次租金填大于 0 的数字');
+  const id = 'c' + uid();
+  S.buyOrRent.customItems.push({ id, name: name.slice(0, 16), icon: getEmoji(name), buyPrice: Math.round(buyPrice), rentPrice: Math.round(rentPrice), maintainCost: Math.round(maintainCost), storageDiff, resaleValue: Math.round(resaleValue), custom: true });
+  Object.assign(S.buyOrRent, { selectedId: id, showAdd: false, showResult: false });
+  commit(); toast('✓ 已添加并选中');
+}
+function borRemoveCustom(id) {
+  const it = S.buyOrRent.customItems.find(i => i.id === id);
+  if (!it || !window.confirm(`删除自定义物品「${it.name}」？`)) return;
+  S.buyOrRent.customItems = S.buyOrRent.customItems.filter(i => i.id !== id);
+  delete S.priceOverrides['rb:' + id]; delete S.priceOverrides['rr:' + id];
+  if (S.buyOrRent.selectedId === id) { S.buyOrRent.selectedId = null; S.buyOrRent.showResult = false; }
+  commit(); toast('已删除');
+}
 function borSet(key, val) {
   S.buyOrRent[key] = num(val);
   if (key === 'months') updateRangeLabel('borMonths', `${S.buyOrRent.months} 个月`);

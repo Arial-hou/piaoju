@@ -1,0 +1,10 @@
+<!doctype html><html><head><meta charset="utf-8"><style>body{margin:0;background:#ddd;display:flex;gap:12px;padding:12px}iframe{width:390px;height:844px;border:0;background:#fff}</style></head><body>
+<script>
+const q = new URLSearchParams(location.search);
+if (q.get('seed')) {
+  const st = { buyOrRent: { selectedId: 'cdemo', useCount: 20, months: 6, showResult: q.get('seed') === 'result', showAdd: q.get('seed') === 'add',
+    customItems: [{ id: 'cdemo', name: '扫地机器人', icon: '🧹', buyPrice: 1800, rentPrice: 40, maintainCost: 60, storageDiff: '中', resaleValue: 50, custom: true }] } };
+  localStorage.setItem('piaoju:v1', JSON.stringify(st));
+} else localStorage.removeItem('piaoju:v1');
+(q.get('r') || '/').split(',').forEach(r => { const f = document.createElement('iframe'); f.src = '../index.html#' + r; document.body.appendChild(f); });
+</script></body></html>

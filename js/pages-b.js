@@ -1,13 +1,13 @@
 // ==================== 买还是租 ====================
 function renderBuyOrRent() {
   const st = S.buyOrRent;
-  const item = buyOrRentItems.find(i => i.id === st.selectedId) || null;
+  const item = borItems().find(i => i.id === st.selectedId) || null;
   const months = st.months ?? S.recommend.rentMonths;
 
   if (st.showResult && item) {
     const r = computeBuyOrRent(item, months, st.useCount);
     const advice = { close: '差不多，看心情', buy: '建议购买', rent: '建议租用' }[r.verdict];
-    const tone = { close: 'bg-stone-700', buy: 'gradient-card', rent: 'bg-amber-600' }[r.verdict];
+    const tone = { close: 'bg-stone-700', buy: 'gradient-card', rent: 'gradient-accent' }[r.verdict];
     const reason = r.closeCall
       ? `在你住的 ${months} 个月里，两种方式只差 ${yuan(Math.abs(r.diff))}。东西大、存放难就租；想随时用就买。`
       : r.diff > 0
@@ -17,7 +17,7 @@ function renderBuyOrRent() {
     return `
       <div class="page">
         ${pageHeader('买还是租', '算上退租转卖和搬家，看哪个真省钱')}
-        <div class="${tone} rounded-2xl p-5 text-center mb-4 shadow-lg text-white" role="status">
+        <div class="${tone} rounded-4xl p-6 text-center mb-4 shadow-lift text-white" role="status">
           <div class="text-4xl mb-1" aria-hidden="true">${item.icon}</div>
           <div class="text-sm opacity-90">${escapeHtml(item.name)} · 住 ${months} 个月 · 约用 ${r.uses} 次</div>
           <div class="text-3xl font-bold my-2">${advice}</div>
@@ -51,20 +51,65 @@ function renderBuyOrRent() {
   }
 
   const prices = item ? rentItemPrices(item) : null;
+  const all = borItems();
+  const q = v => JSON.stringify(v).replace(/"/g, '&quot;');
+  const itemBtn = it => { const p = rentItemPrices(it); const sel = st.selectedId === it.id; return `
+    <div class="relative">
+      <button type="button" role="radio" aria-checked="${sel}" onclick="borSelect(${q(it.id)})" class="w-full h-full flex items-center gap-2 px-2.5 py-2.5 rounded-2xl text-left border-2 btn-press ${sel ? 'border-primary-500 bg-primary-50' : 'border-transparent bg-stone-50 hover:bg-stone-100'}">
+        <span class="text-2xl flex-shrink-0" aria-hidden="true">${it.icon}</span>
+        <span class="min-w-0 flex-1">
+          <span class="block text-sm font-semibold text-stone-900 leading-snug line-clamp-2 break-all ${it.custom ? 'pr-5' : ''}" title="${escapeHtml(it.name)}">${escapeHtml(it.name)}</span>
+          <span class="block text-[11px] leading-4 text-stone-500 mt-0.5">买 ${yuan(p.buyPrice)}<br>租 ${yuan(p.rentPrice)}/次</span>
+          ${it.custom ? '<span class="inline-block mt-1 text-[10px] px-1.5 py-0.5 rounded-full bg-accent-100 text-accent-700 font-medium">自定义</span>' : ''}
+        </span>
+      </button>
+      ${it.custom ? `<button type="button" onclick="borRemoveCustom(${q(it.id)})" class="absolute top-1 right-1 p-1.5 rounded-lg text-stone-400 hover:text-rose-600 hover:bg-white" aria-label="删除 ${escapeHtml(it.name)}">${icon('trash', 14)}</button>` : ''}
+    </div>`; };
+  const sizeOpt = (v, l) => `<option value="${v}">${l}</option>`;
+  const addForm = st.showAdd ? `
+    <div class="mt-4 p-4 rounded-2xl bg-stone-50 border border-stone-200" id="borAddForm">
+      <div class="flex items-center justify-between mb-3">
+        <h3 class="text-sm font-semibold text-stone-900">添加你想算的物品</h3>
+        <button type="button" onclick="borToggleAdd(false)" class="text-xs text-stone-500 px-2 py-1">收起</button>
+      </div>
+      <label for="borNewName" class="block text-xs text-stone-600">物品名称</label>
+      <input id="borNewName" maxlength="16" placeholder="如：扫地机器人、单反镜头、烤箱" class="input mt-1 w-full">${fieldError('borNewName')}
+      <div class="grid grid-cols-2 gap-2 mt-3">
+        <div><label for="borNewBuy" class="block text-xs text-stone-600">买的价格</label>
+          <input id="borNewBuy" type="number" min="1" inputmode="numeric" placeholder="¥" class="input mt-1 w-full">${fieldError('borNewBuy')}</div>
+        <div><label for="borNewRent" class="block text-xs text-stone-600">租一次多少钱</label>
+          <input id="borNewRent" type="number" min="1" inputmode="numeric" placeholder="¥/次" class="input mt-1 w-full">${fieldError('borNewRent')}</div>
+      </div>
+      <details class="mt-3 group">
+        <summary class="text-xs text-primary-700 font-medium cursor-pointer flex items-center gap-1">${icon('chevron', 14, 'transition-transform group-open:rotate-90')}更多选项（不填用默认值）</summary>
+        <div class="grid grid-cols-1 min-[380px]:grid-cols-3 gap-2 mt-2">
+          <div><label for="borNewSize" class="block text-xs text-stone-600">体积/搬家难度</label>
+            <select id="borNewSize" class="input mt-1 w-full">${sizeOpt('低', '小 · 塞包就走')}${sizeOpt('中', '中 · 要单独打包')}${sizeOpt('高', '大 · 搬家费劲')}</select></div>
+          <div><label for="borNewResale" class="block text-xs text-stone-600">一年后卖回几成(%)</label>
+            <input id="borNewResale" type="number" min="0" max="90" value="40" inputmode="numeric" class="input mt-1 w-full"></div>
+          <div><label for="borNewMaintain" class="block text-xs text-stone-600">每年维护费</label>
+            <input id="borNewMaintain" type="number" min="0" value="0" inputmode="numeric" class="input mt-1 w-full"></div>
+        </div>
+      </details>
+      <button type="button" onclick="borAddCustom()" class="btn-press mt-4 w-full gradient-card text-white py-3 rounded-xl font-semibold">添加并选中</button>
+    </div>` : '';
   return `
     <div class="page">
       ${pageHeader('买还是租', '算上退租转卖和搬家，看哪个真省钱')}
       ${card(`
-        <div class="text-sm font-medium text-stone-700 mb-3" id="bor-label">选择物品</div>
-        <div class="grid grid-cols-2 min-[400px]:grid-cols-3 gap-2" role="radiogroup" aria-labelledby="bor-label">
-          ${buyOrRentItems.map(it => { const p = rentItemPrices(it); const sel = st.selectedId === it.id; return `
-            <button type="button" role="radio" aria-checked="${sel}" onclick="borSelect(${it.id})" class="p-3 rounded-xl text-left border-2 btn-press ${sel ? 'border-primary-500 bg-primary-50' : 'border-transparent bg-stone-50'}">
-              <div class="text-2xl mb-1" aria-hidden="true">${it.icon}</div>
-              <div class="text-sm font-semibold text-stone-900">${escapeHtml(it.name)}</div>
-              <div class="text-xs text-stone-600 mt-0.5">买${yuan(p.buyPrice)} / 租${yuan(p.rentPrice)}</div>
-            </button>`; }).join('')}
-        </div>`)}
+        <div class="flex items-center justify-between mb-3">
+          <div class="text-sm font-semibold text-stone-800" id="bor-label">选择物品</div>
+          <span class="text-xs text-stone-500">${all.length} 件 · 可自定义</span>
+        </div>
+        <div class="grid grid-cols-2 gap-2" role="radiogroup" aria-labelledby="bor-label">
+          ${all.map(itemBtn).join('')}
+          <button type="button" onclick="borToggleAdd(true)" aria-expanded="${!!st.showAdd}" class="p-3 rounded-2xl border-2 border-dashed border-primary-300 text-primary-700 bg-white btn-press flex items-center justify-center gap-1.5 min-h-[60px]">
+            ${icon('plus', 20)}<span class="text-sm font-semibold">自定义物品</span>
+          </button>
+        </div>
+        ${addForm}`)}
       ${item ? card(`
+        <div id="borSettings" class="flex items-center gap-2 mb-4 scroll-mt-4"><span class="text-2xl" aria-hidden="true">${item.icon}</span><span class="font-semibold text-stone-900">${escapeHtml(item.name)}</span></div>
         <label for="borMonths" class="block text-sm font-medium text-stone-700 mb-3">这套房还住多久：<span class="text-primary-700 font-bold">${months} 个月</span></label>
         <input id="borMonths" type="range" min="1" max="36" value="${months}" oninput="borSet('months', this.value)" class="w-full">
         <div class="flex justify-between text-xs text-stone-500 mt-2 mb-5"><span>1个月</span><span>36个月</span></div>
@@ -77,8 +122,8 @@ function renderBuyOrRent() {
           <label class="text-xs text-stone-600">你看到的单次租金
             <input type="number" min="1" inputmode="numeric" value="${prices.rentPrice}" onchange="setOverride('rr:${item.id}', this.value)" class="input mt-1 w-full"></label>
         </div>
-        ${hint('默认是估算价；填上你在电商/租赁平台看到的价格，结论会更准。')}`) +
-        `<button type="button" onclick="borCalc()" class="btn-press w-full gradient-card text-white py-4 rounded-2xl font-bold text-lg shadow-lg">帮我算算</button>` : ''}
+        ${hint(item.custom ? '这是你自己加的物品，价格可以随时在这里改。' : '默认是估算价；填上你在电商/租赁平台看到的价格，结论会更准。')}`) +
+        `<div class="pb-2"><button type="button" onclick="borCalc()" class="btn-press w-full gradient-card text-white py-4 rounded-2xl font-bold text-lg shadow-lg">帮我算算</button></div>` : hint('选一件物品，或点「自定义物品」加你自己想算的东西。')}
     </div>`;
 }
 

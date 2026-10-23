@@ -45,11 +45,11 @@ function icon(name, size = 20, cls = '') {
 function pageHeader(title, sub, backTo = '/') {
   return `
     <header class="flex items-center mb-5">
-      <a href="#${backTo}" class="btn-press mr-3 p-2.5 rounded-2xl bg-white shadow-sm text-stone-600 border border-stone-200" aria-label="返回">${icon('back', 22)}</a>
-      <div class="min-w-0"><h1 class="text-xl font-bold text-stone-900">${title}</h1>${sub ? `<p class="text-sm text-stone-600 truncate">${sub}</p>` : ''}</div>
+      <a href="#${backTo}" class="btn-press mr-3 w-10 h-10 flex-shrink-0 flex items-center justify-center rounded-full bg-white shadow-card text-stone-700" aria-label="返回">${icon('back', 20)}</a>
+      <div class="min-w-0"><h1 class="text-[22px] leading-tight font-bold text-stone-900">${title}</h1>${sub ? `<p class="text-[13px] text-stone-500 truncate mt-0.5">${sub}</p>` : ''}</div>
     </header>`;
 }
-const card = (inner, cls = '') => `<section class="bg-white rounded-2xl p-5 mb-4 shadow-sm border border-stone-200 ${cls}">${inner}</section>`;
+const card = (inner, cls = '') => `<section class="bg-white rounded-3xl p-5 mb-4 shadow-card ${cls}">${inner}</section>`;
 const hint = text => `<p class="text-xs text-stone-500 leading-relaxed mt-2">${text}</p>`;
 function fieldError(id) { return `<p id="err-${id}" class="field-error text-xs text-rose-600 mt-1.5 font-medium" role="alert" hidden></p>`; }
 function showFieldError(id, msg) {
