@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "updated": "2026-10",
+  "source": "人工估算：参考主流电商入门款新品价与二手平台常见挂牌价，非实时成交价",
+  "note": "本文件可由 .github/workflows/update-prices.yml 定时更新新品价（需配置京东联盟密钥）；未配置时保持人工估算值。",
+  "goods": {
+    "1": { "price": 200 }, "2": { "price": 150 }, "3": { "price": 300 }, "4": { "price": 120 },
+    "5": { "price": 100 }, "6": { "price": 80 }, "7": { "price": 150 }, "8": { "price": 60 },
+    "9": { "price": 40 }, "10": { "price": 50 }, "11": { "price": 2000 }, "12": { "price": 800 },
+    "13": { "price": 600 }, "14": { "price": 200 }, "15": { "price": 300 }, "16": { "price": 100 },
+    "17": { "price": 300 }, "18": { "price": 200 }, "19": { "price": 400 }, "20": { "price": 300 },
+    "21": { "price": 150 }, "22": { "price": 3000 }, "23": { "price": 2000 }, "24": { "price": 500 },
+    "25": { "price": 2000 }, "26": { "price": 500 }, "27": { "price": 200 }, "28": { "price": 5000 }
+  },
+  "rent": {
+    "1": { "buyPrice": 2500, "rentPrice": 50 }, "2": { "buyPrice": 300, "rentPrice": 20 },
+    "3": { "buyPrice": 800, "rentPrice": 80 }, "4": { "buyPrice": 600, "rentPrice": 30 },
+    "5": { "buyPrice": 5000, "rentPrice": 100 }, "6": { "buyPrice": 1500, "rentPrice": 60 },
+    "7": { "buyPrice": 6000, "rentPrice": 150 }, "8": { "buyPrice": 4000, "rentPrice": 200 },
+    "9": { "buyPrice": 2000, "rentPrice": 150 }, "10": { "buyPrice": 2000, "rentPrice": 80 },
+    "11": { "buyPrice": 1500, "rentPrice": 50 }, "12": { "buyPrice": 2000, "rentPrice": 100 }
+  }
+}

@@ -1,0 +1,26 @@
+<!doctype html>
+<html><head><meta charset="utf-8"><style>body{margin:0}iframe{width:360px;height:800px;border:0;display:block}</style></head>
+<body>
+<iframe id="f"></iframe>
+<pre id="out">running</pre>
+<script>
+const routes = ['/', '/recommend', '/buy-or-rent', '/moving', '/inventory', '/settle', '/lease', '/inspect', '/move-cost', '/settings'];
+const f = document.getElementById('f');
+const res = [];
+let i = 0;
+function next() {
+  if (i >= routes.length) { document.getElementById('out').textContent = 'RESULT\n' + res.join('\n'); return; }
+  const r = routes[i++];
+  f.onload = () => setTimeout(() => {
+    const d = f.contentDocument;
+    const vw = d.documentElement.clientWidth, sw = d.documentElement.scrollWidth;
+    const wide = [...d.querySelectorAll('body *')].filter(e => e.getBoundingClientRect().right > vw + 1)
+      .slice(0, 3).map(e => e.tagName + '.' + String(e.className).slice(0, 50));
+    const err = d.body.innerText.includes('页面出了点问题') ? ' ERROR' : '';
+    res.push(`${sw > vw ? 'OVERFLOW' : 'ok'} ${r} vw=${vw} sw=${sw}${err} ${wide.join(' | ')}`);
+    next();
+  }, 600);
+  f.src = '../index.html?t=' + i + '#' + r;
+}
+next();
+</script></body></html>

@@ -1,0 +1,31 @@
+name: 更新新品价
+
+on:
+  schedule:
+    - cron: '0 2 1 * *'   # 每月 1 日 10:00（北京时间）
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: 拉取京东联盟价格（未配置密钥时自动跳过）
+        env:
+          JD_APP_KEY: ${{ secrets.JD_APP_KEY }}
+          JD_APP_SECRET: ${{ secrets.JD_APP_SECRET }}
+        run: node scripts/update-prices.js
+      - name: 有变化才提交
+        run: |
+          if git diff --quiet data/prices.json; then echo "价格无变化"; exit 0; fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data/prices.json
+          git commit -m "chore: 自动更新新品价"
+          git push
